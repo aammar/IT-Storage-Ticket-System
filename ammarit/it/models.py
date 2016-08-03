@@ -23,7 +23,7 @@ class Item(models.Model):
   owner = models.ForeignKey(Owner, null=True)
 
   def __unicode__(self):
-    return unicode("["+self.category+"] " + str(self.itemNumber) + ": " + self.make + " " + self.model)
+    return unicode(self.make + " " + self.model)
 
 class ItemRequest(models.Model):
   requester = models.ForeignKey(Owner)

@@ -17,29 +17,15 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <script src="{% static 'js/main.js' %}"></script>
   </head>
 
   <body>
     <div class="container">
       <div class='row'>
-        <div class='jumbotron'>
-          <input type='text' placeholder='Employee ID' id='employeeid'/>
-          <div id='employeeiderror' class='errortext'></div>
-        </div>
-      </div>
-      <div class='row'>
-        {% for cat, list in items %}
-          <div class ='well'>
-            {{cat}}
-            {% for i in list %}
-            <div class='well-sm'>
-              <button class='item' onclick="onSelectItem({{i.itemNumber}}, {{i.itemID}});">{{i.make}} {{i.model}}</button>
-            </div>
-            {% endfor %}
-          </div>
-        {% endfor %}
+        <a href="{% url 'reqview' %}"> View Requests </a>
+        <a href="{% url 'employeeview' %}">Employees</a>
       </div>
     </div>
   </body>

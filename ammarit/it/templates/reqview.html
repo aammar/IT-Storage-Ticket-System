@@ -17,27 +17,20 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/reqview.css' %}">
     <script src="{% static 'js/main.js' %}"></script>
   </head>
 
   <body>
     <div class="container">
       <div class='row'>
-        <div class='jumbotron'>
-          <input type='text' placeholder='Employee ID' id='employeeid'/>
-          <div id='employeeiderror' class='errortext'></div>
-        </div>
-      </div>
-      <div class='row'>
-        {% for cat, list in items %}
-          <div class ='well'>
-            {{cat}}
-            {% for i in list %}
-            <div class='well-sm'>
-              <button class='item' onclick="onSelectItem({{i.itemNumber}}, {{i.itemID}});">{{i.make}} {{i.model}}</button>
+        {% for r in requests %}
+          <div class='col-md-4 reqitem well'>
+            <a href="{% url 'user' r.requester.user.id %}/">{{r.requester.FName}} {{r.requester.LName}}</a> requested {{r.item}}
+            <div>
+              <button onclick="accept_req({{r.id}});">Accept</button>
+              <button onclick="reject_req({{r.id}});">Reject</button>
             </div>
-            {% endfor %}
           </div>
         {% endfor %}
       </div>

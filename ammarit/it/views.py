@@ -1,14 +1,20 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from models import *
 
 # Create your views here.
 def index(req):
-  items = Item.objects.all()
+  items = Item.objects.filter(owner=None)
   D = dict()
   for i in items:
     try:
-      D[i.category] += [i]
+      exists = False
+      for ditem in D[i.category]:
+        if str(ditem) == str(i):
+          exists = True
+      if not exists:
+        D[i.category] += [i]
     except:
       D[i.category] = [i]
   items = []
@@ -19,28 +25,19 @@ def index(req):
 def adminindex(req):
   return HttpResponse("HI")
 
-@csrf_exempt
-def makerequest(req):
-  if (req.method != "POST"):
-    return HttpResponse("Unknown error")
+def adminindex(req):
+  return render(req, 'admin.html')
+
+def employeeview(req):
+  return render(req, 'employees.html')
+
+def reqview(req):
+  requests = ItemRequest.objects.all()
+  return render(req, 'reqview.html', {"requests": requests})
+
+def user(req, userid):
   try:
-    requesterID = int(req.POST['id'])
-    requestedItemID = int(req.POST['itemid'])
-    requestedItemNumber = int(req.POST['itemnumber'])
+    user = Owner.objects.get(user__id=userid)
   except:
-    return HttpResponse("Unknown error")
-
-  try:
-    requester = Owner.objects.get(id=requesterID)
-  except Exception as e:
-    return HttpResponse("Invalid user ID")
-
-  try:
-    item = Item.objects.get(itemID=requestedItemID, itemNumber=requestedItemNumber)
-  except:
-    return HttpResponse("Item not found")
-
-  r = ItemRequest(requester=requester, item=item)
-  r.save()
-  return HttpResponse("Request sent")
-
+    return HttpResponseRedirect(reverse('index'))
+  return render(req, 'user.html', {"user": user})
