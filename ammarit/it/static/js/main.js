@@ -54,6 +54,7 @@ function toggleCat(catid) {
     $("#icon-"+catid).addClass('glyphicon-minus');
   }
   container.slideToggle();
+  return false;
 }
 
 function update_search() {
@@ -78,22 +79,42 @@ function update_search() {
   }
 }
 
-function onSelectItem(number, id) {
+function itemRemover(id) {
+  $(id).remove();
+}
+
+function onAddItem(number, _id, itemTitle) {
+  var id = "item-" + number + '-' + _id;
+  var item = "<div id='" + id + "'>";
+  item += "<h3><a onclick='itemRemover(\"#"+id+"\")'><span class='glyphicon glyphicon-remove'></span></a> " + itemTitle + "</h3>";
+  item += "</div>";
+  $("#request-summary")[0].innerHTML += item;
+}
+
+function onMakeRequest() {
   var idobj = $("#employeeid");
   if (idobj[0].value == "") {
     $("#employeeiderror")[0].innerHTML = "Please enter your employee ID";
     return;
   }
   var myid = idobj[0].value;
-  $.post('/it/makerequest', {
-      'id': myid,
-      'itemid': id,
-      'itemnumber': number
-    },
-      function(data) {
-        $("#employeeiderror")[0].innerHTML = "";
-        alert(data);
-    });
+  if (myid != "") {
+    var items = $("#request-summary > div");
+    for (var i = 0; i < items.length; i++) {
+      var idtext = $(items[i]).attr('id').substring(5);
+      var number = idtext.substring(0, idtext.indexOf('-'));
+      var id = idtext.substring(idtext.indexOf('-')+1);
+      $.post('/it/makerequest', {
+          'id': myid,
+          'itemid': id,
+          'itemnumber': number
+        },
+          function(data) {
+            $("#employeeiderror")[0].innerHTML = "";
+            alert(data);
+        });
+    }
+  }
 }
 
 // send an accept_req POST request to the server.
