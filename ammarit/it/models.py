@@ -20,7 +20,9 @@ class Item(models.Model):
   category = models.CharField(max_length=200)
   make = models.CharField(max_length=200)
   model = models.CharField(max_length=200)
-  owner = models.ForeignKey(Owner, null=True)
+  description = models.CharField(max_length=400, blank=True)
+  imgURL = models.CharField(max_length=128, blank=True)
+  owner = models.ForeignKey(Owner, null=True, blank=True)
 
   def __unicode__(self):
     return unicode(self.make + " " + self.model)

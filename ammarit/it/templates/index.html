@@ -49,22 +49,41 @@
 
     <div class="container">
       <div class='row'>
+        <input id="searchtext" class='form-control' type="text" placeholder="Search..." oninput="update_search()"></input>
+      </div>
+      <div id="search-container" style="display: none;">
+        <h2>Search Results</h2>
+        <div id="searchables" class='row'>
+        </div>
+      </div>
+      <div id="categories">
+        {% for cat, list in items %}
+          <div class='row' id="list-{{cat}}">
+            <h2>
+              <a href="#" onclick="toggleCat('{{cat}}');"><span id="icon-{{cat}}" class="glyphicon glyphicon-minus" aria-hidden="true"></span> {{cat}}</a>
+            </h2>
+            <div id="container-{{cat}}">
+              {% for i in list %}
+                <div class="col-sm-6 col-md-4 availableitem">
+                  <div class="thumbnail">
+                    <img class="reqimg" src="{{i.imgURL}}" alt="">
+                    <div class="caption">
+                      <h3>{{i.make}} {{i.model}}</h3>
+                      <p>{{i.description}}</p>
+                      <p><a class="btn btn-primary" role="button" onclick=onclick="onSelectItem({{i.itemNumber}}, {{i.itemID}});">Add to request</a></p>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <div class='row'>
         <div class='jumbotron'>
           <input type='text' placeholder='Employee ID' id='employeeid'/>
           <div id='employeeiderror' class='errortext'></div>
         </div>
-      </div>
-      <div class='row'>
-        {% for cat, list in items %}
-          <div class ='well'>
-            {{cat}}
-            {% for i in list %}
-            <div class='well-sm'>
-              <button class='item' onclick="onSelectItem({{i.itemNumber}}, {{i.itemID}});">{{i.make}} {{i.model}}</button>
-            </div>
-            {% endfor %}
-          </div>
-        {% endfor %}
       </div>
     </div>
   </body>

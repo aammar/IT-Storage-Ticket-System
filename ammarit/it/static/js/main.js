@@ -1,3 +1,4 @@
+var allitems = [];
 
 $(document).ready(function () {
     // Ajax setup to forward the CSRF token
@@ -15,6 +16,8 @@ $(document).ready(function () {
     $('#signInModal').on('shown.bs.modal', function () {
         $('#login_text').focus();
     });
+
+  allitems = $(".availableitem");
 });
 
 function login() {
@@ -39,6 +42,40 @@ function logout() {
   }, function (data) {
     location.reload();
   });
+}
+
+function toggleCat(catid) {
+  var container = $("#container-"+catid);
+  if ($("#icon-"+catid).hasClass('glyphicon-minus')) {
+    $("#icon-"+catid).removeClass('glyphicon-minus');
+    $("#icon-"+catid).addClass('glyphicon-plus');
+  } else {
+    $("#icon-"+catid).removeClass('glyphicon-plus');
+    $("#icon-"+catid).addClass('glyphicon-minus');
+  }
+  container.slideToggle();
+}
+
+function update_search() {
+  var text = $("#searchtext")[0].value.toLowerCase();
+  if (text == "") {
+    $("#categories").show();
+    $("#search-container").hide();
+  } else {
+    $("#categories").hide();
+    $("#search-container").show();
+
+    var result = "<div>";
+    for (var i = 0; i < allitems.length; i++) {
+      var item = $(allitems[i]).find('h3')[0];
+      var itname = item.innerHTML.toLowerCase();
+      if (itname.indexOf(text) != -1)
+        result += '<div class="col-sm-6 col-md-4">' + allitems[i].innerHTML + '</div>';
+    }
+    result += "</div>";
+    console.log(result);
+    $("#searchables")[0].innerHTML = result;
+  }
 }
 
 function onSelectItem(number, id) {
