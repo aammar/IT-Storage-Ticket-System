@@ -1,7 +1,34 @@
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import authenticate, login, logout
 from models import *
+
+def login_action(req):
+  if not (req.method == "POST"):
+    return HttpResponse('')
+
+  try:
+    password = req.POST['password']
+    username = req.POST['username']
+    print ("1")
+    user = authenticate(username=username, password=password)
+    print ("2")
+    if user is not None and (user.is_staff or user.is_superuser):
+      print ("3")
+      login(req, user)
+      print ("4")
+      return HttpResponse("ok")
+  except:
+    return HttpResponse("Invalid username/password")
+  return HttpResponse("Invalid username/password")
+
+def logout_action(req):
+  if not (req.method == "POST"):
+    return HttpResponse('')
+  if req.user.is_authenticated():
+    logout(req)
+  return HttpResponse("ok")
 
 @csrf_exempt
 def makerequest(req):

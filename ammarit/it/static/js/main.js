@@ -17,13 +17,37 @@ $(document).ready(function () {
     });
 });
 
+function login() {
+  var username = $("#username")[0].value;
+  var password = $("#password")[0].value;
+  if (username != "" && password != "") {
+    $.post('/it/login/', {
+      'username': username,
+      'password': password,
+    }, function (data) {
+      if (data == "ok") {
+        location.reload();
+      } else {
+        $("#loginerror")[0].innerHTML = data;
+      }
+    });
+  }
+}
+
+function logout() {
+  $.post('/it/logout/', {
+  }, function (data) {
+    location.reload();
+  });
+}
+
 function onSelectItem(number, id) {
-  idobj = $("#employeeid");
+  var idobj = $("#employeeid");
   if (idobj[0].value == "") {
     $("#employeeiderror")[0].innerHTML = "Please enter your employee ID";
     return;
   }
-  myid = idobj[0].value;
+  var myid = idobj[0].value;
   $.post('/it/makerequest', {
       'id': myid,
       'itemid': id,

@@ -1,39 +1,18 @@
+{% extends 'admin.html' %}
 {% load staticfiles %}
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>IT</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
-    <!-- JQuery -->
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="{% static 'js/jquery.cookie.js' %}"></script>
-    <script src="{% static 'js/jquery.color.js' %}"></script>
-
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'css/reqview.css' %}">
-    <script src="{% static 'js/main.js' %}"></script>
-  </head>
-
-  <body>
-    <div class="container">
-      <div class='row'>
-        {% for r in requests %}
-          <div class='col-md-4 reqitem well'>
-            <a href="{% url 'user' r.requester.user.id %}/">{{r.requester.FName}} {{r.requester.LName}}</a> requested {{r.item}}
-            <div>
-              <button onclick="accept_req({{r.id}});">Accept</button>
-              <button onclick="reject_req({{r.id}});">Reject</button>
-            </div>
+{% block admincontent %}
+  <div class="container">
+    <div class='row'>
+      {% for r in requests %}
+        <div class='col-md-4 reqitem well'>
+          <a href="{% url 'user' r.requester.user.id %}/">{{r.requester.FName}} {{r.requester.LName}}</a> requested {{r.item}}
+          <div>
+            <button onclick="accept_req({{r.id}});">Accept</button>
+            <button onclick="reject_req({{r.id}});">Reject</button>
           </div>
-        {% endfor %}
-      </div>
+        </div>
+      {% endfor %}
     </div>
-  </body>
-</html>
+  </div>
+{% endblock %}

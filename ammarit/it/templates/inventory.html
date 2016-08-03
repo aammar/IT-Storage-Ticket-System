@@ -4,9 +4,9 @@
 {% block admincontent %}
   <div class="container">
     <div class='row'>
-      {% for e in employees %}
-        <div>
-          <a href="{% url 'user' e.user.id %}/">{{e.FName}} {{e.LName}}</a>
+      {% for it, itcount in items %}
+        <div class ='well'>
+          {{it}} x {{itcount}}
         </div>
       {% endfor %}
     </div>

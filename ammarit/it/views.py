@@ -5,6 +5,9 @@ from models import *
 
 # Create your views here.
 def index(req):
+  if req.user.is_authenticated():
+    return HttpResponseRedirect(reverse('adminview'))
+
   items = Item.objects.filter(owner=None)
   D = dict()
   for i in items:
@@ -23,19 +26,46 @@ def index(req):
   return render(req, 'index.html', {"items": items})
 
 def adminindex(req):
-  return HttpResponse("HI")
+  if not req.user.is_authenticated():
+    return HttpResponseRedirect(reverse('index'))
 
-def adminindex(req):
   return render(req, 'admin.html')
 
 def employeeview(req):
-  return render(req, 'employees.html')
+  if not req.user.is_authenticated():
+    return HttpResponseRedirect(reverse('index'))
+
+  employees = Owner.objects.all()
+  return render(req, 'employees.html', {"employees": employees, "active_employees": "active"})
 
 def reqview(req):
+  if not req.user.is_authenticated():
+    return HttpResponseRedirect(reverse('index'))
+
   requests = ItemRequest.objects.all()
-  return render(req, 'reqview.html', {"requests": requests})
+  return render(req, 'reqview.html', {"requests": requests, "active_requests": "active"})
+
+def inventoryview(req):
+  if not req.user.is_authenticated():
+    return HttpResponseRedirect(reverse('index'))
+
+  items = Item.objects.filter(owner=None)
+  D = dict()
+  for i in items:
+    try:
+      it = D[str(i)]
+      D[str(i)] = [it[0], it[1] + 1]
+    except:
+      D[str(i)] = [i, 1]
+  items = []
+  for k in D.keys():
+    items += [[D[k][0], D[k][1]]]
+  return render(req, 'inventory.html', {"items": items, "active_inventory": "active"})
 
 def user(req, userid):
+  if not req.user.is_authenticated():
+    return HttpResponseRedirect(reverse('index'))
+
   try:
     user = Owner.objects.get(user__id=userid)
   except:
