@@ -110,10 +110,10 @@ function onMakeRequest() {
           'itemnumber': number
         },
           function(data) {
-            $("#employeeiderror")[0].innerHTML = "";
-            alert(data);
         });
     }
+    $("#employeeiderror")[0].innerHTML = "";
+    $("#request-summart")[0].innerHTML = "";
   }
 }
 
