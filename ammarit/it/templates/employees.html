@@ -4,11 +4,31 @@
 {% block admincontent %}
   <div class="container">
     <div class='row'>
-      {% for e in employees %}
-        <div>
-          <a href="{% url 'user' e.user.id %}/">{{e.FName}} {{e.LName}}</a>
-        </div>
-      {% endfor %}
+      <input id="searchtext" class='form-control' type="text" placeholder="Search..." oninput="update_search()"></input>
+    </div>
+    <br/>
+    <div id="search-container" style="display: none;">
+      <h2>Search Results</h2>
+      <div id="searchables" class='row'>
+      </div>
+    </div>
+
+    <div id="categories">
+      <div class='row'>
+        {% for e in employees %}
+          <div class="col-sm-6 col-md-4 availableitem">
+            <div class="thumbnail">
+              <img class="reqimg" src="{{e.imgURL}}" onerror="this.src='{% static 'images/placeholder.png' %}'">
+              <div class="caption">
+                <h3><a href="{% url 'user' e.user.id %}/">{{e.FName}} {{e.LName}}</a></h3>
+                <p></p>
+                <p>
+                </p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
   </div>
 {% endblock %}

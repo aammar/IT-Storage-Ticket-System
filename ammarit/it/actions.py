@@ -30,7 +30,6 @@ def logout_action(req):
     logout(req)
   return HttpResponse("ok")
 
-@csrf_exempt
 def makerequest(req):
   if (req.method != "POST"):
     return HttpResponse("Unknown error")
@@ -42,7 +41,7 @@ def makerequest(req):
     return HttpResponse("Unknown error")
 
   try:
-    requester = Owner.objects.get(id=requesterID)
+    requester = Owner.objects.get(user__id=requesterID)
   except Exception as e:
     return HttpResponse("Invalid user ID")
 
@@ -55,7 +54,6 @@ def makerequest(req):
   r.save()
   return HttpResponse("Request sent")
 
-@csrf_exempt
 def accept_req(req):
   try:
     reqid = int(req.POST['reqid'])
@@ -73,7 +71,6 @@ def accept_req(req):
 
   return HttpResponse("ok")
 
-@csrf_exempt
 def reject_req(req):
   try:
     reqid = int(req.POST['reqid'])
@@ -86,5 +83,53 @@ def reject_req(req):
     return HttpResponse("Item request not found")
 
   req.delete()
+
+  return HttpResponse("ok")
+
+def return_item(req):
+  try:
+    itid = int(req.POST['itid'])
+    itnum = int(req.POST['itnum'])
+  except:
+    return HttpResponse("Invalid request")
+
+  try:
+    item = Item.objects.get(itemID=itid, itemNumber=itnum)
+  except:
+    return HttpResponse("Item not found")
+
+  item.owner = None
+  item.save()
+
+  return HttpResponse("ok")
+
+def lost_item(req):
+  try:
+    itid = int(req.POST['itid'])
+    itnum = int(req.POST['itnum'])
+  except:
+    return HttpResponse("Invalid request")
+
+  try:
+    item = Item.objects.get(itemID=itid, itemNumber=itnum)
+  except:
+    return HttpResponse("Item not found")
+
+  item.delete()
+
+  return HttpResponse("ok")
+
+def delete_user(req):
+  try:
+    uid = int(req.POST['uid'])
+  except:
+    return HttpResponse("Invalid request")
+
+  try:
+    usr = User.objects.get(id=uid)
+  except:
+    return HttpResponse("User not found")
+
+  usr.delete()
 
   return HttpResponse("ok")

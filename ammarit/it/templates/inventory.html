@@ -4,11 +4,40 @@
 {% block admincontent %}
   <div class="container">
     <div class='row'>
-      {% for it, itcount in items %}
-        <div class ='well'>
-          {{it}} x {{itcount}}
-        </div>
-      {% endfor %}
+      <input id="searchtext" class='form-control' type="text" placeholder="Search..." oninput="update_search()"></input>
+    </div>
+    <br/>
+    <div id="search-container" style="display: none;">
+      <h2>Search Results</h2>
+      <div id="searchables" class='row'>
+      </div>
+    </div>
+
+    <div id="categories">
+      <div class='row'>
+        {% for cat, its in items %}
+          <div class='row' id="list-{{cat}}">
+            <h2>
+              <a href="#" onclick="return toggleCat('{{cat}}');"><span id="icon-{{cat}}" class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{cat}}</a>
+            </h2>
+            <div id="container-{{cat}}" style="display: none;">
+              {% for it, count in its %}
+                <div class="col-sm-6 col-md-4 availableitem">
+                  <div class="thumbnail">
+                    <img class="reqimg" src="{{it.imgURL}}" onerror="this.src='{% static 'images/placeholder.png' %}'">
+                    <div class="caption">
+                      <h3>({{count}}) {{it}}</h3>
+                      <p></p>
+                      <p>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
   </div>
 {% endblock %}

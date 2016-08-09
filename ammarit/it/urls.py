@@ -16,4 +16,7 @@ urlpatterns = [
     url(r'^makerequest', actions.makerequest, name='makerequest'),
     url(r'^accept_req', actions.accept_req, name='accept_req'),
     url(r'^reject_req', actions.reject_req, name='reject_req'),
+    url(r'^return_item', actions.return_item, name='return_item'),
+    url(r'^lost_item', actions.lost_item, name='lost_item'),
+    url(r'^delete_user', actions.delete_user, name='delete_user'),
 ]

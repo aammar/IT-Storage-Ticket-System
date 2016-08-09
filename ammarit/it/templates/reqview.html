@@ -4,15 +4,27 @@
 {% block admincontent %}
   <div class="container">
     <div class='row'>
+      {% if num_requests > 0 %}
       {% for r in requests %}
-        <div class='col-md-4 reqitem well'>
-          <a href="{% url 'user' r.requester.user.id %}/">{{r.requester.FName}} {{r.requester.LName}}</a> requested {{r.item}}
-          <div>
-            <button onclick="accept_req({{r.id}});">Accept</button>
-            <button onclick="reject_req({{r.id}});">Reject</button>
+        <div class="col-sm-6 col-md-4 reqitem">
+          <div class="thumbnail">
+            <img class="reqimg" src="{{r.item.imgURL}}" onerror="this.src='{% static 'images/placeholder.png' %}'">
+            <div class="caption">
+              <h3><a href="{% url 'user' r.requester.user.id %}/">{{r.requester.FName}} {{r.requester.LName}}</a></h3>
+              <p>requested {{r.item}}</p>
+              <p>
+                <a class="btn btn-primary" role="button" onclick="accept_req({{r.id}});">Accept</a>
+                <a class="btn btn-danger" role="button" onclick="reject_req({{r.id}});">Reject</a>
+              </p>
+            </div>
           </div>
         </div>
       {% endfor %}
+      {% else %}
+        <div class="jumbotron">
+          <h1>There are no pending requests</h1>
+        </div>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

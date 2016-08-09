@@ -29,26 +29,30 @@ def adminindex(req):
   if not req.user.is_authenticated():
     return HttpResponseRedirect(reverse('index'))
 
-  return render(req, 'admin.html')
+  num_reqs = ItemRequest.objects.count()
+  return render(req, 'admin.html', {"num_requests": num_reqs})
 
 def employeeview(req):
   if not req.user.is_authenticated():
     return HttpResponseRedirect(reverse('index'))
 
   employees = Owner.objects.all()
-  return render(req, 'employees.html', {"employees": employees, "active_employees": "active"})
+  num_reqs = ItemRequest.objects.count()
+  return render(req, 'employees.html', {"employees": employees, "active_employees": "active", "num_requests": num_reqs})
 
 def reqview(req):
   if not req.user.is_authenticated():
     return HttpResponseRedirect(reverse('index'))
 
   requests = ItemRequest.objects.all()
-  return render(req, 'reqview.html', {"requests": requests, "active_requests": "active"})
+  num_reqs = ItemRequest.objects.count()
+  return render(req, 'reqview.html', {"requests": requests, "active_requests": "active", "num_requests": num_reqs})
 
 def inventoryview(req):
   if not req.user.is_authenticated():
     return HttpResponseRedirect(reverse('index'))
 
+  # make a dictionary D that maps from [item name] -> [quantity]
   items = Item.objects.filter(owner=None)
   D = dict()
   for i in items:
@@ -60,7 +64,28 @@ def inventoryview(req):
   items = []
   for k in D.keys():
     items += [[D[k][0], D[k][1]]]
-  return render(req, 'inventory.html', {"items": items, "active_inventory": "active"})
+  # items is now a list of all [item, count]
+  # convert to a dictionary D that maps from [category] -> [[item, count]]
+  D = dict()
+  for it in items:
+    i = it[0]
+    try:
+      exists = False
+      for ditem in D[i.category]:
+        if str(ditem[0]) == str(i):
+          exists = True
+      if not exists:
+        D[i.category] += [it]
+    except:
+      D[i.category] = [it]
+
+  # finally create a list of all [category, [item, count]]
+  items = []
+  for k in D.keys():
+    items += [[str(k), D[k]]]
+
+  num_reqs = ItemRequest.objects.count()
+  return render(req, 'inventory.html', {"items": items, "active_inventory": "active", "num_requests": num_reqs})
 
 def user(req, userid):
   if not req.user.is_authenticated():
@@ -70,4 +95,18 @@ def user(req, userid):
     user = Owner.objects.get(user__id=userid)
   except:
     return HttpResponseRedirect(reverse('index'))
-  return render(req, 'user.html', {"user": user})
+
+  items = Item.objects.filter(owner=user)
+  D = dict()
+  for i in items:
+    try:
+      it = D[str(i)]
+      D[str(i)] = [it[0], it[1] + 1]
+    except:
+      D[str(i)] = [i, 1]
+  items = []
+  for k in D.keys():
+    items += [[D[k][0], D[k][1]]]
+
+  num_reqs = ItemRequest.objects.count()
+  return render(req, 'user.html', {"items": items, "user": user, "num_requests": num_reqs})

@@ -17,7 +17,7 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <script src="{% static 'js/main.js' %}"></script>
   </head>
 
@@ -38,7 +38,13 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
-            <li class="{{active_requests}}"><a href="{% url 'reqview' %}">Requests</a></li>
+            <li class="{{active_requests}}"><a href="{% url 'reqview' %}">
+              {% if num_requests > 0 %}
+              Requests <span class="badge">{{num_requests}}</span>
+              {% else %}
+              Requests
+              {% endif %}
+            </a></li>
             <li class="{{active_employees}}"><a href="{% url 'employeeview' %}">Employees</a></li>
             <li class="{{active_inventory}}"><a href="{% url 'inventoryview' %}">Inventory</a></li>
           </ul>
@@ -50,6 +56,15 @@
     </nav>
 
     {% block admincontent %}
+    <div class="container">
+      <div class="row">
+        <div class="jumbotron">
+          <h1>The IT Department</h1>
+          <br/>
+          <p>Put custom stuff here</p>
+        </div>
+      </div>
+    </div>
     {% endblock %}
   </body>
 </html>

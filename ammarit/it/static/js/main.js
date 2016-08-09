@@ -113,7 +113,8 @@ function onMakeRequest() {
         });
     }
     $("#employeeiderror")[0].innerHTML = "";
-    $("#request-summart")[0].innerHTML = "";
+    $("#request-summary")[0].innerHTML = "";
+    $("#employeeid")[0].innerHTML = "";
   }
 }
 
@@ -135,6 +136,47 @@ function accept_req(reqid) {
 function reject_req(reqid) {
   $.post('/it/reject_req/', {
     'reqid': reqid,
+  }, function(data) {
+    if (data == "ok") {
+      // refresh the page to update the view
+      location.reload();
+    } else {
+      alert("Failed to do action: " + data);
+    }
+  });
+}
+
+function on_return(itid, itnum) {
+  $.post('/it/return_item/', {
+    'itid': itid,
+    'itnum': itnum,
+  }, function(data) {
+    if (data == "ok") {
+      // refresh the page to update the view
+      location.reload();
+    } else {
+      alert("Failed to do action: " + data);
+    }
+  });
+}
+
+function on_lost(itid, itnum) {
+  $.post('/it/lost_item/', {
+    'itid': itid,
+    'itnum': itnum,
+  }, function(data) {
+    if (data == "ok") {
+      // refresh the page to update the view
+      location.reload();
+    } else {
+      alert("Failed to do action: " + data);
+    }
+  });
+}
+
+function delete_user(uid) {
+  $.post('/it/delete_user/', {
+    'uid': uid,
   }, function(data) {
     if (data == "ok") {
       // refresh the page to update the view

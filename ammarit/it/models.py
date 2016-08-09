@@ -8,6 +8,7 @@ class Owner(models.Model):
   FName = models.CharField(max_length=200)
   LName = models.CharField(max_length=200)
   ownerType = models.CharField(max_length=200)
+  imgURL = models.CharField(max_length=128, blank=True)
   def __unicode__(self):
     return unicode(self.FName + " " + self.LName)
 
