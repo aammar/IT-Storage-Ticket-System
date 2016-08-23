@@ -74,7 +74,6 @@ function update_search() {
         result += '<div class="col-sm-6 col-md-4">' + allitems[i].innerHTML + '</div>';
     }
     result += "</div>";
-    console.log(result);
     $("#searchables")[0].innerHTML = result;
   }
 }
@@ -83,8 +82,8 @@ function itemRemover(id) {
   $(id).remove();
 }
 
-function onAddItem(number, _id, itemTitle) {
-  var id = "item-" + number + '-' + _id;
+function onAddItem(number, itemTitle) {
+  var id = "item-" + number;
   var item = "<div id='" + id + "'>";
   item += "<h3><a onclick='itemRemover(\"#"+id+"\")'><span class='glyphicon glyphicon-remove'></span></a> " + itemTitle + "</h3>";
   item += "</div>";
@@ -93,35 +92,44 @@ function onAddItem(number, _id, itemTitle) {
 
 function onMakeRequest() {
   var idobj = $("#employeeid");
+  var desc = $("#request-desc");
   if (idobj[0].value == "") {
     $("#employeeiderror")[0].innerHTML = "Please enter your employee ID";
+    return;
+  }
+  if (desc[0].value == "") {
+    $("#employeeiderror")[0].innerHTML = "Please enter a description for the request";
     return;
   }
   var myid = idobj[0].value;
   if (myid != "") {
     var items = $("#request-summary > div");
+    var list = [];
     for (var i = 0; i < items.length; i++) {
       var idtext = $(items[i]).attr('id').substring(5);
-      var number = idtext.substring(0, idtext.indexOf('-'));
-      var id = idtext.substring(idtext.indexOf('-')+1);
-      $.post('/it/makerequest', {
-          'id': myid,
-          'itemid': id,
-          'itemnumber': number
-        },
-          function(data) {
-        });
+      var number = idtext.substring(0);
+      list += [number];
     }
-    $("#employeeiderror")[0].innerHTML = "";
-    $("#request-summary")[0].innerHTML = "";
-    $("#employeeid")[0].innerHTML = "";
+    $.post('/it/makerequest', {
+        'id': myid,
+        'items': JSON.stringify(list),
+        'desc': desc[0].value
+      }, function(data) {
+          if (data == "ok") {
+            $("#employeeiderror")[0].innerHTML = "";
+            $("#request-summary")[0].value = "";
+            $("#employeeid")[0].value = "";
+          }
+      });
   }
 }
 
 // send an accept_req POST request to the server.
 function accept_req(reqid) {
+  var desc = $("#request-response-"+reqid)[0].value;
   $.post('/it/accept_req/', {
     'reqid': reqid,
+    'desc': desc,
   }, function(data) {
     if (data == "ok") {
       // refresh the page to update the view
@@ -134,8 +142,10 @@ function accept_req(reqid) {
 
 // send a reject_req POST request to the server.
 function reject_req(reqid) {
+  var desc = $("#request-response-"+reqid)[0].value;
   $.post('/it/reject_req/', {
     'reqid': reqid,
+    'desc': desc,
   }, function(data) {
     if (data == "ok") {
       // refresh the page to update the view
@@ -146,10 +156,9 @@ function reject_req(reqid) {
   });
 }
 
-function on_return(itid, itnum) {
+function on_return(itid) {
   $.post('/it/return_item/', {
     'itid': itid,
-    'itnum': itnum,
   }, function(data) {
     if (data == "ok") {
       // refresh the page to update the view
@@ -160,10 +169,9 @@ function on_return(itid, itnum) {
   });
 }
 
-function on_lost(itid, itnum) {
+function on_lost(itid) {
   $.post('/it/lost_item/', {
     'itid': itid,
-    'itnum': itnum,
   }, function(data) {
     if (data == "ok") {
       // refresh the page to update the view
@@ -187,3 +195,62 @@ function delete_user(uid) {
   });
 }
 
+function on_new_item() {
+  $("#newitem").show();
+  $("#restockitem").hide();
+  $("#newitemtab").addClass('active');
+  $("#restocktab").removeClass('active');
+}
+
+function on_restock() {
+  $("#newitem").hide();
+  $("#restockitem").show();
+  $("#newitemtab").removeClass('active');
+  $("#restocktab").addClass('active');
+}
+
+function submit_new_item(url) {
+  $.get(url, {
+    "itemid": $("#itemid")[0].value,
+    "itemnumber": $("#itemnumber")[0].value,
+    "itemmake": $("#itemmake")[0].value,
+    "itemmodel": $("#itemmodel")[0].value,
+    "itemcat": $("#itemcat")[0].value,
+    "itemurl": $("#itemurl")[0].value,
+    "itemdesc": $("#itemdesc")[0].value,
+  }, function(data) {
+    if (data == "ok") {
+      location.reload();
+    } else {
+      $("#newitemerror")[0].innerHTML = data;
+    }
+  });
+}
+
+function submit_restock(url) {
+  $.get(url, {
+    "itemid": $("#itemid-restock")[0].value,
+    "itemnumber": $("#itemnumber-restock")[0].value,
+  }, function(data) {
+    if (data == "ok") {
+      $("#itemid-restock")[0].value = "";
+      $("#newitemerror")[0].innerHTML = "";
+    } else {
+      $("#newitemerror")[0].innerHTML = data;
+    }
+  });
+}
+
+function organize_reqitems() {
+  var container = $("#reqitems");
+  var items = $(".reqitemcontainer");
+
+  var newcode = "";
+  for (var i = 0; i < items.length/3; i++) {
+    newcode += "<div class='row'>";
+    for (var j = i * 3; j < items.length && j < i * 3 + 3; j++)
+      newcode += items[j].innerHTML;
+    newcode += "</div>";
+  }
+  container[0].innerHTML = newcode;
+}

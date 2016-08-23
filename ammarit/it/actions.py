@@ -4,6 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from models import *
 
+import json
+
 def login_action(req):
   if not (req.method == "POST"):
     return HttpResponse('')
@@ -11,13 +13,9 @@ def login_action(req):
   try:
     password = req.POST['password']
     username = req.POST['username']
-    print ("1")
     user = authenticate(username=username, password=password)
-    print ("2")
     if user is not None and (user.is_staff or user.is_superuser):
-      print ("3")
       login(req, user)
-      print ("4")
       return HttpResponse("ok")
   except:
     return HttpResponse("Invalid username/password")
@@ -35,8 +33,9 @@ def makerequest(req):
     return HttpResponse("Unknown error")
   try:
     requesterID = int(req.POST['id'])
-    requestedItemID = int(req.POST['itemid'])
-    requestedItemNumber = int(req.POST['itemnumber'])
+    items = req.POST['items']
+    desc = req.POST['desc']
+    items = json.loads(items)
   except:
     return HttpResponse("Unknown error")
 
@@ -45,28 +44,36 @@ def makerequest(req):
   except Exception as e:
     return HttpResponse("Invalid user ID")
 
-  try:
-    item = Item.objects.get(itemID=requestedItemID, itemNumber=requestedItemNumber)
-  except:
-    return HttpResponse("Item not found")
-
-  r = ItemRequest(requester=requester, item=item)
+  r = ItemRequest(requester=requester, desc=desc)
   r.save()
-  return HttpResponse("Request sent")
+  for i in items:
+    ri = RequestedItem(request=r, itemNumber=int(i))
+    ri.save()
+
+  return HttpResponse("ok")
 
 def accept_req(req):
   try:
     reqid = int(req.POST['reqid'])
+    desc = req.POST['desc']
   except:
     return HttpResponse("Invalid request")
 
   try:
-    req = ItemRequest.objects.get(id=reqid)
+    req = RequestedItem.objects.get(id=reqid)
   except:
     return HttpResponse("Item request not found")
 
-  req.item.owner = req.requester
-  req.item.save()
+  try:
+    item = Item.objects.filter(itemNumber=req.itemNumber, owner=None)[0]
+  except:
+    return HttpResponse("Out of stock")
+
+  item.owner = req.request.requester
+  item.ownership_desc = desc
+  item.save()
+  if RequestedItem.objects.filter(request=req.request).count() == 1:
+    req.request.delete()
   req.delete()
 
   return HttpResponse("ok")
@@ -74,14 +81,17 @@ def accept_req(req):
 def reject_req(req):
   try:
     reqid = int(req.POST['reqid'])
+    desc = req.POST['desc']
   except:
     return HttpResponse("Invalid request")
 
   try:
-    req = ItemRequest.objects.get(id=reqid)
+    req = RequestedItem.objects.get(id=reqid)
   except:
     return HttpResponse("Item request not found")
 
+  if RequestedItem.objects.filter(request=req.request).count() == 1:
+    req.request.delete()
   req.delete()
 
   return HttpResponse("ok")
@@ -89,12 +99,11 @@ def reject_req(req):
 def return_item(req):
   try:
     itid = int(req.POST['itid'])
-    itnum = int(req.POST['itnum'])
   except:
     return HttpResponse("Invalid request")
 
   try:
-    item = Item.objects.get(itemID=itid, itemNumber=itnum)
+    item = Item.objects.get(itemID=itid)
   except:
     return HttpResponse("Item not found")
 
@@ -106,12 +115,11 @@ def return_item(req):
 def lost_item(req):
   try:
     itid = int(req.POST['itid'])
-    itnum = int(req.POST['itnum'])
   except:
     return HttpResponse("Invalid request")
 
   try:
-    item = Item.objects.get(itemID=itid, itemNumber=itnum)
+    item = Item.objects.get(itemID=itid)
   except:
     return HttpResponse("Item not found")
 
@@ -131,5 +139,41 @@ def delete_user(req):
     return HttpResponse("User not found")
 
   usr.delete()
+
+  return HttpResponse("ok")
+
+def addnewitem(req):
+  try:
+    id = int(req.GET['itemid'])
+    make = req.GET['itemmake']
+    model = req.GET['itemmodel']
+    number = int(req.GET['itemnumber'])
+    url = req.GET['itemurl']
+    desc = req.GET['itemdesc']
+    category = req.GET['itemcat']
+  except:
+    return HttpResponse("Invalid Request")
+
+  try:
+    it = Item(itemID=id, make=make, model=model, description=desc, imgURL=url, itemNumber=number, category=category)
+    it.save()
+  except:
+    return HttpResponse("Cannot create item")
+
+  return HttpResponse("ok")
+
+def restockitem(req):
+  try:
+    id = int(req.GET['itemid'])
+    number = int(req.GET['itemnumber'])
+  except:
+    return HttpResponse("Invalid Request")
+
+  try:
+    existing = Item.objects.filter(itemNumber=number)[0]
+    it = Item(itemID=id, make=existing.make, model=existing.model, description=existing.description, imgURL=existing.imgURL, itemNumber=number, category=existing.category)
+    it.save()
+  except:
+    return HttpResponse("Cannot create item")
 
   return HttpResponse("ok")

@@ -52,21 +52,27 @@
         </div>
       </div>
       <br/>
+      <script>$(document).ready(function() {organize_reqitems()});</script>
+      <div id="reqitems">
       {% for it, itcount in items %}
-        <div class="col-sm-6 col-md-4 reqitem">
-          <div class="thumbnail">
-            <img class="reqimg" src="{{it.imgURL}}" onerror="this.src='{% static 'images/placeholder.png' %}'">
-            <div class="caption">
-              <h3>({{itcount}}) {{it}}</h3>
-              <br/>
-              <p>
-                <a class="btn btn-primary" role="button" onclick="on_return({{it.itemID}}, {{it.itemNumber}});">Return</a>
-                <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#confirm-modal" onclick="$('#modal-button').click(function() {on_lost({{it.itemID}}, {{it.itemNumber}})});">Lost</button>
-              </p>
+        <div class="reqitemcontainer">
+          <div class="col-md-4 reqitem">
+            <div class="thumbnail">
+              <img class="reqimg" src="{{it.imgURL}}" onerror="this.src='{% static 'images/placeholder.png' %}'">
+              <div class="caption">
+                <h3>({{itcount}}) {{it}}</h3>
+                <br/>
+                <p>{{it.ownership_desc}}</p>
+                <p>
+                  <a class="btn btn-primary" role="button" onclick="on_return({{it.itemID}});">Return</a>
+                  <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#confirm-modal" onclick="$('#modal-button').click(function() {on_lost({{it.itemID}})});">Lost</button>
+                </p>
+              </div>
             </div>
           </div>
         </div>
       {% endfor %}
+      </div>
     </div>
   </div>
 {% endblock %}

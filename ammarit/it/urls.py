@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^reqview', views.reqview, name='reqview'),
     url(r'^employeeview', views.employeeview, name='employeeview'),
     url(r'^inventoryview', views.inventoryview, name='inventoryview'),
+    url(r'^additemview', views.additemview, name='additemview'),
     url(r'^user/(?P<userid>\w+)', views.user, name='user'),
 
     # actions
@@ -19,4 +20,6 @@ urlpatterns = [
     url(r'^return_item', actions.return_item, name='return_item'),
     url(r'^lost_item', actions.lost_item, name='lost_item'),
     url(r'^delete_user', actions.delete_user, name='delete_user'),
+    url(r'^addnewitem', actions.addnewitem, name='addnewitem'),
+    url(r'^restockitem', actions.restockitem, name='restockitem'),
 ]

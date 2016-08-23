@@ -1,0 +1,68 @@
+{% extends 'admin.html' %}
+{% load staticfiles %}
+
+{% block admincontent %}
+  <div class="container">
+    <div class="row">
+      <ul class="nav nav-pills nav-justified">
+        <li role="presentation" id="newitemtab" class="active"><a href="#" onclick="on_new_item();">New Item</a></li>
+        <li role="presentation" id="restocktab"><a href="#" onclick="on_restock();">Restock</a></li>
+      </ul>
+
+      <div style="margin: 15px">
+        <form id="newitem" action="#">
+          <div class="row">
+            <div class="col-md-4">
+              <input type="text" class="form-control" id="itemid" placeholder="Item ID" required>
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" id="itemnumber" placeholder="Item Number (label)" required>
+            </div>
+          </div>
+          <br/>
+          <div class="row">
+            <div class="col-md-4">
+              <input type="text" class="form-control" id="itemmake" placeholder="Item Make" required>
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" id="itemmodel" placeholder="Item Model" required>
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" id="itemcat" placeholder="Item Category" required>
+            </div>
+          </div>
+          <br/>
+          <div class="row">
+            <div class="col-md-12">
+              <input type="text" class="form-control" id="itemurl" placeholder="Image URL">
+              <br/>
+              <textarea type="text" class="form-control" id="itemdesc" placeholder="Description" rows="3"></textarea>
+            </div>
+          </div>
+          <br/>
+          <div class="btn btn-default" onclick='submit_new_item("{% url 'addnewitem' %}")'>Add Item</div>
+        </form>
+
+        <form id="restockitem" style="display: none;">
+          <div class="row">
+            <div class="col-md-4">
+              <input type="text" class="form-control" id="itemnumber-restock" placeholder="Item Number">
+              <br/>
+              <div class="input-group">
+                <input type="text" id="itemid-restock" class="form-control" placeholder="Item ID">
+                <span class="input-group-btn">
+                  <button class="btn btn-default" type="button" onclick='submit_restock("{% url 'restockitem' %}");'>Add</button>
+                </span>
+              </div><!-- /input-group -->
+            </div>
+            <div class="col-md-8">
+            </div>
+          </div>
+        </form>
+
+        <br/>
+        <div id="newitemerror" class="errortext"></div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

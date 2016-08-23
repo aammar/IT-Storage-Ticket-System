@@ -8,3 +8,4 @@ from it.models import *
 admin.site.register(Owner)
 admin.site.register(Item)
 admin.site.register(ItemRequest)
+admin.site.register(RequestedItem)
