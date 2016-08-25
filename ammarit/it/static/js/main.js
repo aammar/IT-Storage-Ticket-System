@@ -68,7 +68,7 @@ function update_search() {
 
     var result = "<div>";
     for (var i = 0; i < allitems.length; i++) {
-      var item = $(allitems[i]).find('h3')[0];
+      var item = $(allitems[i]).find('h3 > a')[0];
       var itname = item.innerHTML.toLowerCase();
       if (itname.indexOf(text) != -1)
         result += '<div class="col-sm-6 col-md-4">' + allitems[i].innerHTML + '</div>';
@@ -253,4 +253,31 @@ function organize_reqitems() {
     newcode += "</div>";
   }
   container[0].innerHTML = newcode;
+}
+
+function get_relative_time(t) {
+  var cur_time = new Date();
+  var in_time = new Date(t);
+  var deltaMS = cur_time.getTime() - in_time.getTime();
+  var deltaSec = deltaMS / 1000.0;
+  var deltaMin = deltaSec / 60.0;
+  var deltaHr = deltaMin / 60.0; deltaMin = deltaMin % 60;
+  var deltaDay = deltaHr / 24.0; deltaHr = deltaHr % 24;
+
+  if (deltaDay > 30)
+    return gettext("more than a month ago");
+  if (deltaDay > 1) {
+    if (deltaDay < 2)
+      return gettext("yesterday");
+    return interpolate(gettext("%s days ago"), [Math.floor(deltaDay)]);
+  } else {
+    if (deltaHr > 1)
+      return interpolate(gettext("%s hours %s minutes ago"), [Math.floor(deltaHr), Math.floor(deltaMin)]);
+    else if (deltaMin > 1) {
+      if (deltaMin < 2)
+        return interpolate(gettext("%s minutes ago"), [Math.floor(deltaMin)]);
+      return interpolate(gettext("%s minutes ago"), [Math.floor(deltaMin)]);
+    } else
+      return gettext("just now");
+  }
 }

@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^employeeview', views.employeeview, name='employeeview'),
     url(r'^inventoryview', views.inventoryview, name='inventoryview'),
     url(r'^additemview', views.additemview, name='additemview'),
+    url(r'^adminlog', views.log, name='log'),
     url(r'^user/(?P<userid>\w+)', views.user, name='user'),
 
     # actions

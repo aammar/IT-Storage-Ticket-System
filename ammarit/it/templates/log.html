@@ -1,0 +1,17 @@
+{% extends 'admin.html' %}
+{% load staticfiles %}
+
+{% block admincontent %}
+  <div class="container">
+    <div class="row">
+      {% for l in log %}
+        <div class='alert alert-{{l.type}}' role='alert'>
+          <span style="float:right;">{{l.time}}</span>
+          {{l.logText | safe}}
+          <br/>
+          {{l.subtext | safe}}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

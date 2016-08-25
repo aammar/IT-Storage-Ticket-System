@@ -6,6 +6,14 @@ from models import *
 
 import json
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
 def login_action(req):
   if not (req.method == "POST"):
     return HttpResponse('')
@@ -44,6 +52,15 @@ def makerequest(req):
   except Exception as e:
     return HttpResponse("Invalid user ID")
 
+  logstr = "<a href='"+reverse("user", args=(str(requester.user.id),))+"'>"+str(requester)+"</a> ["+get_client_ip(req)+"] requested " + str(len(items)) + " item(s)"
+  subtext = "<p>Request description: " + desc + "</p>"
+  subtext += "<p> Requested items: "
+  for i in items:
+    subtext += "<span class='label label-default'>" + str(i) + "</span> "
+  subtext += "</p>"
+  l = Log(logText=logstr, type="warning", subtext=subtext)
+  l.save()
+
   r = ItemRequest(requester=requester, desc=desc)
   r.save()
   for i in items:
@@ -52,10 +69,10 @@ def makerequest(req):
 
   return HttpResponse("ok")
 
-def accept_req(req):
+def accept_req(request):
   try:
-    reqid = int(req.POST['reqid'])
-    desc = req.POST['desc']
+    reqid = int(request.POST['reqid'])
+    desc = request.POST['desc']
   except:
     return HttpResponse("Invalid request")
 
@@ -69,6 +86,11 @@ def accept_req(req):
   except:
     return HttpResponse("Out of stock")
 
+  logstr = str(request.user.username)+" accepted " + "<a href='"+reverse("user", args=(str(req.request.requester.user.id),))+"'>"+str(req.request.requester)+"</a>'s request of a " + str(item) + " <span class='label label-default'>"+str(item.itemNumber)+"</span>"
+  subtext = "Response: " + desc
+  l = Log(logText=logstr, type="success", subtext=subtext)
+  l.save()
+
   item.owner = req.request.requester
   item.ownership_desc = desc
   item.save()
@@ -78,10 +100,10 @@ def accept_req(req):
 
   return HttpResponse("ok")
 
-def reject_req(req):
+def reject_req(request):
   try:
-    reqid = int(req.POST['reqid'])
-    desc = req.POST['desc']
+    reqid = int(request.POST['reqid'])
+    desc = request.POST['desc']
   except:
     return HttpResponse("Invalid request")
 
@@ -89,6 +111,16 @@ def reject_req(req):
     req = RequestedItem.objects.get(id=reqid)
   except:
     return HttpResponse("Item request not found")
+
+  try:
+    item = Item.objects.filter(itemNumber=req.itemNumber, owner=None)[0]
+  except:
+    item = None
+
+  logstr = str(request.user.username)+" rejected " + "<a href='"+reverse("user", args=(str(req.request.requester.user.id),))+"'>"+str(req.request.requester)+"</a>'s request of a " + str(item) + " <span class='label label-default'>"+str(item.itemNumber)+"</span>"
+  subtext = "Response: " + desc
+  l = Log(logText=logstr, type="danger", subtext=subtext)
+  l.save()
 
   if RequestedItem.objects.filter(request=req.request).count() == 1:
     req.request.delete()
@@ -107,6 +139,11 @@ def return_item(req):
   except:
     return HttpResponse("Item not found")
 
+  logstr = str(req.user.username)+" returned item " + str(item) + "<span class='label label-default'>"+str(item.itemNumber)+"</span> from <a href='"+reverse("user", args=(str(item.owner.user.id),))+"'>" + str(item.owner) + "</a>"
+  subtext = ""
+  l = Log(logText=logstr, type="info", subtext=subtext)
+  l.save()
+
   item.owner = None
   item.save()
 
@@ -122,6 +159,11 @@ def lost_item(req):
     item = Item.objects.get(itemID=itid)
   except:
     return HttpResponse("Item not found")
+
+  logstr = str(req.user.username)+" marked item " + str(item) + "<span class='label label-default'>"+str(item.itemNumber)+"</span> from <a href='"+reverse("user", args=(str(item.owner.user.id),))+"'>" + str(item.owner) + "</a> as lost"
+  subtext = ""
+  l = Log(logText=logstr, type="info", subtext=subtext)
+  l.save()
 
   item.delete()
 

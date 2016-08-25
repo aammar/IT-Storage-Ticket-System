@@ -6,7 +6,8 @@
     <div class='row'>
       {% if num_requests > 0 %}
       {% for r, items in requests %}
-        <h3><a href="{% url 'user' r.requester.user.id %}/">{{r.requester.FName}} {{r.requester.LName}}</a> requested</h3>
+      <div class='row'>
+        <h3><a href="{% url 'user' r.requester.user.id %}/">{{r.requester.FName}} {{r.requester.LName}}</a> requested <span style="font-size: 60%; color:#999999">at {{r.time}}</span></h3>
         <p>{{r.desc}}</p>
         {% for it, ri in items %}
           <div class="col-sm-6 col-md-4 reqitem">
@@ -24,6 +25,7 @@
             </div>
           </div>
         {% endfor %}
+      </div>
       {% endfor %}
       {% else %}
         <div class="jumbotron">

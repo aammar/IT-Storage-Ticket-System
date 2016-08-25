@@ -85,9 +85,21 @@ def inventoryview(req):
   return render(req, 'inventory.html', {"items": items, "active_inventory": "active", "num_requests": num_reqs})
 
 def additemview(req):
+  if not req.user.is_authenticated():
+    return HttpResponseRedirect(reverse('index'))
+
   requests = ItemRequest.objects.all()
   num_reqs = ItemRequest.objects.count()
   return render(req, 'additem.html', {"requests": requests, "active_additem": "active", "num_requests": num_reqs})
+
+def log(req):
+  if not req.user.is_authenticated():
+    return HttpResponseRedirect(reverse('index'))
+
+  requests = ItemRequest.objects.all()
+  num_reqs = ItemRequest.objects.count()
+  l = Log.objects.order_by('-time').all()
+  return render(req, 'log.html', {"requests": requests, "active_log": "active", "num_requests": num_reqs, "log": l})
 
 def user(req, userid):
   if not req.user.is_authenticated():
